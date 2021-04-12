@@ -33,8 +33,24 @@ async function barChart() {
 	const graph = entireChart.append("g")
 		.style("transform", `translate(${dimensions.margins.left}px, ${dimensions.margins.top}px)`);
 
-	const xScale = d3.scaleTime()
-		.domain(d3.extent(dataset.data, xAccessor))
+	const dates = [];
+	for( let i = 0; i < dataset.data.length; i++ ) {
+		dates.push(xAccessor(dataset.data[i]));
+	}
+	const years = [];
+	for( let i = 0; i < dataset.data.length; i++ ) {
+		let formatYear = d3.timeFormat("%Y");
+		let formatMonth = d3.timeFormat("%m");
+//		console.log(formatYear(dateParser(dataset.data[i][0])));
+		if( formatYear(dateParser(dataset.data[i][0])) % 5 == 0 && formatMonth(dateParser(dataset.data[i][0])) == 1) {
+			years.push(dateParser(dataset.data[i][0]));
+		}
+
+	}
+	console.log(years);
+
+	const xScale = d3.scaleBand()
+		.domain([...dates])
 		.range([0, dimensions.boundedWidth]);
 
 	const yScale = d3.scaleLinear()
@@ -50,6 +66,21 @@ async function barChart() {
 		.attr("y", d => yScale(yAccessor(d)))
 		.attr("width", dimensions.boundedWidth / dataset.data.length - barPadding / 2)
 		.attr("height", d => dimensions.boundedHeight - yScale(yAccessor(d)));
+
+	const xAxisGenerator = d3.axisBottom()
+		.scale(xScale)
+		.tickValues([...years])
+		.tickFormat(d3.timeFormat("%Y"));
+
+	const xAxis = graph.append("g")
+		.call(xAxisGenerator)
+		.style("transform", `translateY(${dimensions.boundedHeight}px)`);
+
+	const yAxisGenerator = d3.axisLeft()
+		.scale(yScale);
+
+	const yAxis = graph.append("g")
+		.call(yAxisGenerator);
 }
 
 barChart();
