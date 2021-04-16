@@ -14,10 +14,10 @@ async function barChart() {
 		width: width,
 		height: height,
 		margins: {
-			top: 30,
+			top: 100,
 			right: 15,
 			bottom: 50,
-			left: 50,
+			left: 75,
 		},
 	};
 	dimensions.boundedWidth = dimensions.width - dimensions.margins.left - dimensions.margins.right;
@@ -65,7 +65,19 @@ async function barChart() {
 		.attr("x", d => xScale(xAccessor(d)))
 		.attr("y", d => yScale(yAccessor(d)))
 		.attr("width", dimensions.boundedWidth / dataset.data.length - barPadding / 2)
-		.attr("height", d => dimensions.boundedHeight - yScale(yAccessor(d)));
+		.attr("height", d => dimensions.boundedHeight - yScale(yAccessor(d)))
+		.attr("class", "bar")
+		.attr("data-date", d => d[0])
+		.attr("data-gdp", d => d[1]);
+
+	const title = graph.append("text")
+		.attr("x", dimensions.boundedWidth / 2)
+		.attr("y", -10)
+		.text("United States Gross Domestic Product (GDP)")
+		.style("fill", "black")
+		.style("text-anchor", "middle")
+		.style("font-size", "2em")
+		.attr("id", "title");
 
 	const xAxisGenerator = d3.axisBottom()
 		.scale(xScale)
@@ -74,13 +86,47 @@ async function barChart() {
 
 	const xAxis = graph.append("g")
 		.call(xAxisGenerator)
-		.style("transform", `translateY(${dimensions.boundedHeight}px)`);
+		.style("transform", `translateY(${dimensions.boundedHeight}px)`)
+		.attr("id", "x-axis");
+
+	const xAxisLabel = xAxis.append("text")
+		.attr("x", dimensions.boundedWidth / 2)
+		.attr("y", dimensions.margins.bottom - 5)
+		.attr("fill", "black")
+		.style("font-size", "2em")
+		.html("Year");
 
 	const yAxisGenerator = d3.axisLeft()
 		.scale(yScale);
 
 	const yAxis = graph.append("g")
-		.call(yAxisGenerator);
+		.call(yAxisGenerator)
+		.attr("id", "y-axis");
+
+	const yAxisLabel = yAxis.append("text")
+		.attr("x", -dimensions.boundedHeight / 2)
+		.attr("y", -dimensions.margins.left + 25)
+		.attr("fill", "black")
+		.style("font-size", "2em")
+		.text("Billions of Dollars")
+		.style("transform", "rotate(-90deg)")
+		.style("text-anchor", "middle");
+
+	graph.selectAll("rect")
+		.on("mouseenter", onMouseEnter)
+		.on("mouseleave", onMouseLeave)
+	const tooltip = d3.select("#tooltip");
+	function onMouseEnter(e, datum) {
+		tooltip.select("#year")
+			.text(datum[0])
+		tooltip.select("#gdp")
+			.text(datum[1])
+		tooltip.attr("data-date", datum[0])
+			.style("opacity", 1);
+	}
+	function onMouseLeave(e, datum) {
+		tooltip.style("opacity", 0);
+	}
 }
 
 barChart();

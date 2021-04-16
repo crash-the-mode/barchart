@@ -1,0 +1,12 @@
+body {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+}
+main {
+	position: relative;
+}
+#tooltip {
+	z-index: 99;
+	position: absolute;
+}
