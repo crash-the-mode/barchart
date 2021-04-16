@@ -6,6 +6,12 @@ body {
 main {
 	position: relative;
 }
+.bar {
+	fill: cornflowerblue;
+}
+.bar:hover {
+	fill: orange;
+}
 #tooltip {
 	z-index: 99;
 	position: absolute;
