@@ -12,7 +12,20 @@ main {
 .bar:hover {
 	fill: orange;
 }
+#x-axis > g > text {
+	font-size: 1.2em;
+}
+#y-axis > g > text {
+	font-size: 1.2em;
+}
 #tooltip {
+	opacity: 0;
 	z-index: 99;
 	position: absolute;
+	pointer-events: none;
+	border: 1px solid black;
+	padding: 1em;
+	text-align: center;
+	width: 175px;
+	font-size: 1.5em;
 }

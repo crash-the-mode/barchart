@@ -41,8 +41,8 @@ async function barChart() {
 	for( let i = 0; i < dataset.data.length; i++ ) {
 		let formatYear = d3.timeFormat("%Y");
 		let formatMonth = d3.timeFormat("%m");
-//		console.log(formatYear(dateParser(dataset.data[i][0])));
-		if( formatYear(dateParser(dataset.data[i][0])) % 5 == 0 && formatMonth(dateParser(dataset.data[i][0])) == 1) {
+//		console.log(typeof(formatYear(dateParser(dataset.data[i][0]))));
+		if( parseInt(formatYear(dateParser(dataset.data[i][0])), 10) % 5 === 0 && parseInt(formatMonth(dateParser(dataset.data[i][0])), 10) === 1) {
 			years.push(dateParser(dataset.data[i][0]));
 		}
 
@@ -105,7 +105,7 @@ async function barChart() {
 
 	const yAxisLabel = yAxis.append("text")
 		.attr("x", -dimensions.boundedHeight / 2)
-		.attr("y", -dimensions.margins.left + 25)
+		.attr("y", -dimensions.margins.left + 15)
 		.attr("fill", "black")
 		.style("font-size", "2em")
 		.text("Billions of Dollars")
@@ -118,15 +118,41 @@ async function barChart() {
 	const tooltip = d3.select("#tooltip");
 	function onMouseEnter(e, datum) {
 		tooltip.select("#year")
-			.text(datum[0])
+			.text(getQuarter(datum[0]));
+		tooltip.attr("data-date", datum[0]);
 		tooltip.select("#gdp")
-			.text(datum[1])
-		tooltip.attr("data-date", datum[0])
-			.style("opacity", 1);
+			.text(`$${datum[1]}`);
+		tooltip.style("transform", `translate(calc(-25% + ${dimensions.boundedWidth / 2}px), calc(-25% + ${dimensions.boundedHeight / 2}px)`);
+		tooltip.style("opacity", 1);
 	}
 	function onMouseLeave(e, datum) {
 		tooltip.style("opacity", 0);
 	}
 }
-
+function getQuarter(datum) {
+	const formatYear = d3.timeFormat("%Y");
+	const formatMonth = d3.timeFormat("%m");
+	const dateParser = d3.timeParse("%Y-%m-%d");
+	let quarter = "Q0";
+	let dataDate = formatMonth(dateParser(datum));
+//	console.log(dataDate);
+	switch(dataDate) {
+		case("01") :
+			quarter = "Q1";
+			break;
+		case("04") :
+			quarter = "Q2";
+			break;
+		case("07") :
+			quarter = "Q3";
+			break;
+		case("10"):
+			quarter = "Q4";
+			break;
+		default:
+			quarter = "Q-1";
+			break;
+	}
+	return `${formatYear(dateParser(datum))} ${quarter}`;
+}
 barChart();
